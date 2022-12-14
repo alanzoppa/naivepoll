@@ -29,13 +29,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Message = void 0;
 const natural_1 = __importDefault(require("natural"));
 const util = __importStar(require("util"));
+// @ts-ignore this type/arity disagreement
+const lexicon = new natural_1.default.Lexicon("EN", "?", "NNP");
+const ruleSet = new natural_1.default.RuleSet('EN');
+const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
+const st = new natural_1.default.SentenceTokenizer();
+const wt = new natural_1.default.WordPunctTokenizer();
 class Sentence {
-    constructor(taggedSentence) {
-        this.tags = taggedSentence;
+    constructor(sentence) {
+        this.rawSentence = sentence;
+        this.tags = tagger.tag(wt.tokenize(sentence)).taggedWords;
         this.coalesce_possesives();
         this.collapse_nouns();
     }
-    // 
     collapse_nouns() {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i + 1]];
@@ -91,26 +97,17 @@ class Sentence {
         return output;
     }
 }
-// @ts-ignore this type/arity disagreement
-const lexicon = new natural_1.default.Lexicon("EN", "?", "NNP");
-const ruleSet = new natural_1.default.RuleSet('EN');
-const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
-const st = new natural_1.default.SentenceTokenizer();
-const wt = new natural_1.default.WordPunctTokenizer();
 class Message {
     constructor(msg) {
         this.rawMessage = msg;
-        this.rawTokens = st.tokenize(msg).map(s => wt.tokenize(s));
-        this.sentences = this.rawTokens.map(s => {
-            return new Sentence(tagger.tag(s).taggedWords);
-        });
+        this.sentences = st.tokenize(msg).map(s => new Sentence(s));
     }
 }
 exports.Message = Message;
 if (require.main === module) {
     let taggedObj = new Message("Where should we go? Pequod's or Gino's?");
-    console.log(util.inspect(taggedObj.rawTokens, false, null, true));
-    console.log(util.inspect(taggedObj.sentences, false, null, true));
+    // console.log( util.inspect(taggedObj.rawTokens, false, null, true) );
+    // console.log( util.inspect(taggedObj.sentences, false, null, true) );
     let declarative = new Message("The quick brown fox jumped over the lazy dog.");
     console.log(util.inspect(declarative.sentences, false, null, true));
     console.log(util.inspect(lexicon, false, null, true));

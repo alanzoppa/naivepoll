@@ -36,14 +36,12 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     let user = message.user;
     for (let sentence of msg.sentences) {
         if (sentence.hasOrClause) {
-            let nouns = sentence.nouns.map(s => `"${s.token}"`);
-            let rawSentence = sentence.tags.map(t => t.token).join(" ");
-            let simplePollText = `Make this a poll! Just send this slash command: \`/poll "${rawSentence}" ${nouns.join(" ")}\``;
+            let nouns = sentence.nouns.map(s => `"${s.token}"`).join(" ");
+            let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${nouns}\``;
             yield client.chat.postEphemeral({
                 channel: message.channel,
                 user: user,
                 text: simplePollText
-                // text: `\`${JSON.stringify(sentence.nouns.map(s => s.token))}\``
             });
         }
     }
