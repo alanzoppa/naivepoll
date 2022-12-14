@@ -11,13 +11,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const bolt_1 = require("@slack/bolt");
 const Message_1 = require("./Message");
-const app = new bolt_1.App({
-    signingSecret: process.env.SIGNING_SECRET,
-    token: process.env.TOKEN,
-    socketMode: true,
-    appToken: process.env.APP_TOKEN
-});
-/* Add functionality here */
+const bolt_config_1 = require("./bolt_config");
+let appConfig;
+if (process.env.SLACK_SOCKET_MODE == "true") {
+    appConfig = {
+        signingSecret: process.env.SIGNING_SECRET,
+        token: process.env.TOKEN,
+        socketMode: true,
+        appToken: process.env.APP_TOKEN
+    };
+}
+else {
+    appConfig = {
+        token: process.env.TOKEN,
+        receiver: bolt_config_1.receiver
+    };
+}
+const app = new bolt_1.App(appConfig);
 app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(message);
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904

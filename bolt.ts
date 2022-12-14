@@ -1,18 +1,27 @@
-import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
+import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver } from '@slack/bolt';
 import {Message} from "./Message";
+import {receiver} from "./bolt_config";
 
 
+let appConfig;
+
+if (process.env.SLACK_SOCKET_MODE == "true") {
+	appConfig = {
+		signingSecret: process.env.SIGNING_SECRET,
+		token: process.env.TOKEN,
+		socketMode: true,
+		appToken: process.env.APP_TOKEN
+	};
+}
+else {
+	appConfig = {
+		token: process.env.TOKEN,
+		receiver: receiver
+	}
+}
 
 
-const app = new App({
-	signingSecret: process.env.SIGNING_SECRET,
-	token: process.env.TOKEN,
-	socketMode: true,
-	appToken: process.env.APP_TOKEN
-});
-
-/* Add functionality here */
-
+const app = new App(appConfig);
 
 
 
