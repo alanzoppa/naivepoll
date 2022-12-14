@@ -45,3 +45,5 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     yield app.start(process.env.PORT || 3000);
     console.log('⚡️ Bolt app is running!');
 }))();
+// @ts-ignore
+module.exports.handler = bolt_config_1.handler;

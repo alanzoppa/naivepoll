@@ -1,6 +1,6 @@
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver } from '@slack/bolt';
 import {Message} from "./Message";
-import {receiver} from "./bolt_config";
+import {receiver, handler} from "./bolt_config";
 
 
 let appConfig;
@@ -46,8 +46,9 @@ app.message(async ({ message, client }) => {
 (async () => {
 	// Start the app
 	await app.start(process.env.PORT || 3000);
-
 	console.log('⚡️ Bolt app is running!');
-
-
 })();
+
+
+// @ts-ignore
+module.exports.handler = handler;
