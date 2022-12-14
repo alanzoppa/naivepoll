@@ -1,9 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import {Message} from "./Message";
-import natural, { Sentence } from "natural";
-//@ts-ignore
-import SentenceAnalyzer from "./node_modules/natural/lib/natural/analyzers/sentence_analyzer"
-import * as util from "util";
+import natural from "natural";
 
 
 describe("tagging", () => {
@@ -53,8 +50,6 @@ describe("Sentence", () => {
     })
 
     test ("nouns", ()=> {
-        // console.log(snooting.sentences[0].tags);
-        // console.log(snooting.sentences[0].nouns.map( (n)=> n.token));
         expect(
             snooting.sentences[0].nouns.map( (n)=> n.token)
             ).toEqual(
