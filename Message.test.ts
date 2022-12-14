@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {Message} from "./Message"
+import {Message} from "./Message";
 import natural, { Sentence } from "natural";
 //@ts-ignore
 import SentenceAnalyzer from "./node_modules/natural/lib/natural/analyzers/sentence_analyzer"

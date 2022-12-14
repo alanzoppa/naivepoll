@@ -1,4 +1,5 @@
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction } from '@slack/bolt';
+import {Message} from "./Message";
 
 
 
@@ -15,9 +16,22 @@ const app = new App({
 
 
 
-app.message(async ({ message, say }) => {
+app.message(async ({ message, client }) => {
 	console.log(message);
-	await say("hi");
+
+
+	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+    let msg = new Message(message.text);
+	//expect(question.sentences[0].hasOrClause).toEqual(false);
+
+
+
+	await client.chat.postEphemeral({
+		channel: message.channel,
+		// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+		user: message.user,
+		text: `\`${JSON.stringify(msg.sentences.map( (s)=> {return s.tags} ), null, "  ")}\``
+	})
 });
 
 (async () => {
