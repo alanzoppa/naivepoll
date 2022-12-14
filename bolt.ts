@@ -23,17 +23,11 @@ else {
 
 const app = new App(appConfig);
 
-
-
 app.message(async ({ message, client }) => {
 	console.log(message);
 
-
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let msg = new Message(message.text);
-	//expect(question.sentences[0].hasOrClause).toEqual(false);
-
-
 
 	await client.chat.postEphemeral({
 		channel: message.channel,
@@ -49,6 +43,4 @@ app.message(async ({ message, client }) => {
 	console.log('⚡️ Bolt app is running!');
 })();
 
-
-// @ts-ignore
 module.exports.handler = handler;

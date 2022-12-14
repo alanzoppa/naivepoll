@@ -32,7 +32,6 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     console.log(message);
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let msg = new Message_1.Message(message.text);
-    //expect(question.sentences[0].hasOrClause).toEqual(false);
     yield client.chat.postEphemeral({
         channel: message.channel,
         // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
@@ -45,5 +44,4 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     yield app.start(process.env.PORT || 3000);
     console.log('⚡️ Bolt app is running!');
 }))();
-// @ts-ignore
 module.exports.handler = bolt_config_1.handler;
