@@ -29,12 +29,22 @@ app.message(async ({ message, client }) => {
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let msg = new Message(message.text);
 
-	await client.chat.postEphemeral({
-		channel: message.channel,
-		// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-		user: message.user,
-		text: `\`${JSON.stringify(msg.sentences.map( (s)=> {return s.tags} ), null, "  ")}\``
-	})
+	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+	let user = message.user;
+
+
+	for (let sentence of msg.sentences) {
+		if (sentence.hasOrClause) {
+
+			await client.chat.postEphemeral({
+				channel: message.channel,
+				user: user,
+				text: `\`${JSON.stringify(sentence.nouns.map(s => s.token))}\``
+			})
+		
+		}
+	}
+
 });
 
 (async () => {
