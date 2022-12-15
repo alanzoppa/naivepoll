@@ -32,6 +32,8 @@ else {
 ;
 const app = new bolt_1.App(appConfig);
 app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function* () {
+    if ((0, bolt_config_1.isInvalid)(message))
+        return;
     if (DEVELOPMENT) {
         console.log(message);
     }
@@ -56,33 +58,53 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
 }));
 app.action(/^createPoll/, ({ action, ack, say, body }) => __awaiter(void 0, void 0, void 0, function* () {
     yield ack();
-    console.log(action);
-    // console.log(body);
-    // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+    // @ts-ignore
     let sentence = new Message_1.Sentence(action.value);
-    // let [sentence, id] = [new Sentence(action.value), body.container.message_ts]
     let votes = sentence.nouns.map(noun => [noun, 0]);
     let blocks = (0, blocks_1.makePoll)(votes);
     say({
-        text: `This is a poll The options are ${sentence.emojifiedNounsList}`,
+        text: sentence.rawSentence,
         blocks: blocks
     });
 }));
 app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 0, void 0, void 0, function* () {
     yield ack();
-    console.log(action);
+    // console.log(action);
     // console.log(body);
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-    let [channel, target_ts, channel_id, noun, value] = [action.channel, body.container.message_ts, body.container.channel_id, action.text.text, parseInt(action.value)];
-    let original_message = yield client.conversations.history({
+    let [og_text, poll_ts, channel_id, noun, value] = [body.message.text, body.container.message_ts, body.container.channel_id, action.text.text, JSON.parse(action.value)];
+    noun = noun.replace(/ \(\d+\)/, '');
+    let poll_message = yield client.conversations.history({
         channel: channel_id,
-        latest: target_ts,
+        latest: poll_ts,
         inclusive: true,
         limit: 1
     });
-    original_message = original_message === null || original_message === void 0 ? void 0 : original_message.messages[0];
-    console.log(original_message);
-    // client.chat.update({ channel: channel, ts: target_ts, blocks: makePoll});
+    poll_message = poll_message === null || poll_message === void 0 ? void 0 : poll_message.messages[0];
+    for (let i = 0; i < value.length; i++) {
+        console.log(noun, value[i]);
+        if (value[i][0] == noun) {
+            value[i][1] += 1;
+        }
+    }
+    console.log(value);
+    let blocks = (0, blocks_1.makePoll)(value);
+    console.log(blocks[1]);
+    client.chat.update({
+        channel: channel_id,
+        ts: poll_ts,
+        blocks: blocks,
+        as_user: true,
+        text: "baz"
+    });
+    // say({
+    // 	channel: channel_id,
+    // 	// ts: poll_ts,
+    // 	blocks: blocks,
+    // 	// as_user: true,
+    // 	text: "baz"
+    // });
+    // client.chat.delete({ channel: channel_id, ts: poll_ts})
 }));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield app.start(process.env.PORT || 3000);

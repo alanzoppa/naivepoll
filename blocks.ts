@@ -25,15 +25,15 @@ export const makePollButton = (message:string, id:string) => {
 }
 
 export const makePoll = (votes:any[][]) => {
-    let buttons = votes.map( (v,i) => {
+    let buttons = votes.map( (v,i,ary) => {
         return {
             "type": "button",
             "text": {
                 "type": "plain_text",
-                "text": v[0],
+                "text": `${v[0]} (${v[1]})`,
                 "emoji": true
             },
-            "value": `${v[1]}`,
+            "value": JSON.stringify(ary),
             "action_id": `increment__${v[0]}`
         }
     });

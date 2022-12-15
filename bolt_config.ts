@@ -11,3 +11,7 @@ export const handler = async (event, context, callback) => {
     const handler = await receiver.start();
     return handler(event, context, callback);
 }
+
+export const isInvalid = (message:object) => {
+	return ("message" in message) || ("subtype" in message);
+}
