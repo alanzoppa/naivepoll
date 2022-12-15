@@ -6,7 +6,10 @@ const lexicon = new natural.Lexicon("EN", "?", "NNP");
 const ruleSet = new natural.RuleSet('EN');
 const tagger = new natural.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural.SentenceTokenizer();
-const wt = new natural.WordPunctTokenizer();
+// const wt = new natural.WordPunctTokenizer();
+
+const wt = new natural.RegexpTokenizer({pattern: /([A-zÀ-ÿ-]+|[0-9._]+|.|!|\?|'|"|;|,|-)/});
+
 
 
 export let wordIsEmoji = (word:string):boolean => {
@@ -17,16 +20,16 @@ class Sentence {
     tags: TaggedWord[];
     rawSentence: string;
     static nounTypes = ['NN', 'NNP'];
-    static phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
+    static phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?', ':'];
 
     constructor(sentence: string) {
         this.rawSentence = sentence;
         this.tags = tagger.tag(wt.tokenize(sentence)).taggedWords
         this.coalesce_possesives();
-        this.collapse_nouns();
+        this.collapseNouns();
     }
 
-    private collapse_nouns():void {
+    private collapseNouns():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i+1]]
             if (Sentence.phraseTypes.includes(curr?.tag)) {
@@ -34,7 +37,7 @@ class Sentence {
                 let cursor = 1;
                 while (Sentence.phraseTypes.includes(tmp_next?.tag)) {
                     curr.token = curr.token + " " + tmp_next.token;
-                    curr.tag = "NNP"
+                    curr.tag = "NNP";
                     delete this.tags[i+cursor];
                     cursor++;
                     tmp_next = this.tags[i+cursor];
@@ -43,6 +46,14 @@ class Sentence {
             }
         };
         this.tags = this.tags.filter(Boolean);
+        this.fixEmoji();
+    }
+
+    // This really really needs to be a parser rule
+    private fixEmoji():void {
+        for (let tag of this.tags) {
+            tag.token = tag.token.replace(/: (\w+) :/g, ":$1:");
+        }
     }
 
     private coalesce_possesives():void {
@@ -64,24 +75,28 @@ class Sentence {
         }
     } 
 
-    get nouns() {
+    get nouns():string[] {
         return this.tags.filter( t => t.tag[0] == "N" ).map(s => s.token);
     }
 
-    get emojifiedNounsList() {
-        return this.nouns.map(s => wordIsEmoji(s) ? `":${s.toLowerCase()}:"` : `"${s}"`)
+    get emojifiedNounsList():string[] {
+        return this.nouns.map(s => wordIsEmoji(s) ? `:${s.toLowerCase()}:` : s)
     }
 
-    get isQuestion() {
+    get pollOptions():string {
+        return this.emojifiedNounsList.map(n => `"${n}"`).join(" ")
+    }
+
+    get isQuestion():boolean {
         return this.tags[this.tags.length-1].token == '?'
     }
 
-    get hasOrClause() {
+    get hasOrClause():boolean {
         return this.tags.some( tag => (tag.token == 'or' && tag.tag == 'CC') )
     }
 
-    get orClauses() {
-        if (!this.hasOrClause) {return null}
+    get orClauses():object[] {
+        if (!this.hasOrClause) {return []}
         let output:object[]   = [];
         this.tags.forEach( (val, i)=> {
             if (val.token == 'or') {

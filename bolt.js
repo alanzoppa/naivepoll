@@ -12,8 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bolt_1 = require("@slack/bolt");
 const Message_1 = require("./Message");
 const bolt_config_1 = require("./bolt_config");
+const DEVELOPMENT = (process.env.DEVELOPMENT == "true");
 let appConfig;
-if (process.env.SLACK_SOCKET_MODE == "true") {
+if (DEVELOPMENT) {
     appConfig = {
         signingSecret: process.env.SIGNING_SECRET,
         token: process.env.TOKEN,
@@ -27,17 +28,20 @@ else {
         receiver: bolt_config_1.receiver
     };
 }
+;
 const app = new bolt_1.App(appConfig);
 app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(message);
+    if (DEVELOPMENT) {
+        console.log(message);
+    }
+    ;
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let msg = new Message_1.Message(message.text);
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let user = message.user;
     for (let sentence of msg.sentences) {
         if (sentence.hasOrClause) {
-            let nouns = sentence.emojifiedNounsList.join(" ");
-            let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${nouns}\``;
+            let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
             yield client.chat.postEphemeral({
                 channel: message.channel,
                 user: user,

@@ -16,6 +16,13 @@ describe("Sentence", () => {
     let multiword = new Message("Kevin's stinky Pizza or Todd's greasy pasta?");
     let snooting = new Message("Should we go snooting, micro snooting, or retro snooting?");
     let emojis = new Message("Should we get pizza or beer?");
+    let emojis_actual = new Message("What do you think? Should we get a pet :frog: or a pet chicken?");
+
+
+    test("word tokenization", ()=> {
+        console.log(emojis_actual.sentences[1].tags)
+        expect(emojis_actual.sentences[1].tags[4].token).toEqual("pet :frog:");
+    })
 
     test("isQuestion", ()=> {
         expect(question.sentences[0].isQuestion).toBe(true);
@@ -34,7 +41,7 @@ describe("Sentence", () => {
     })
 
     test("orClauses", ()=> {
-        expect(question.sentences[0].orClauses).toBeNull();
+        expect(question.sentences[0].orClauses).toEqual([]);
         let oc:any;
         oc = question.sentences[1].orClauses;
         expect(oc[0].index).toBe(1);
@@ -55,14 +62,32 @@ describe("Sentence", () => {
             ).toEqual(
                 ["micro snooting", "retro snooting"]
             )
+
+        expect(
+            emojis_actual.sentences[1].nouns
+            ).toEqual(
+                ["pet :frog:", "pet chicken"]
+            )
     })
 
     test ("emojifiedNounList", ()=> {
         expect(
             emojis.sentences[0].emojifiedNounsList
             ).toEqual(
-                ['":pizza:"', '":beer:"']
+                [':pizza:', ':beer:']
             )
+
+        expect(
+            emojis_actual.sentences[1].emojifiedNounsList
+            ).toEqual(
+                ["pet :frog:", "pet chicken"]
+            )
+    })
+
+    test ("pollOptions", ()=> {
+        expect(
+            emojis.sentences[0].pollOptions
+            ).toEqual(`":pizza:" ":beer:"`)
     })
 
 })

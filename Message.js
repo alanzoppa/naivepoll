@@ -11,7 +11,8 @@ const lexicon = new natural_1.default.Lexicon("EN", "?", "NNP");
 const ruleSet = new natural_1.default.RuleSet('EN');
 const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural_1.default.SentenceTokenizer();
-const wt = new natural_1.default.WordPunctTokenizer();
+// const wt = new natural.WordPunctTokenizer();
+const wt = new natural_1.default.RegexpTokenizer({ pattern: /([A-zÀ-ÿ-]+|[0-9._]+|.|!|\?|'|"|;|,|-)/ });
 let wordIsEmoji = (word) => {
     return word.toLowerCase() in default_emoji_json_1.default;
 };
@@ -21,9 +22,9 @@ class Sentence {
         this.rawSentence = sentence;
         this.tags = tagger.tag(wt.tokenize(sentence)).taggedWords;
         this.coalesce_possesives();
-        this.collapse_nouns();
+        this.collapseNouns();
     }
-    collapse_nouns() {
+    collapseNouns() {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i + 1]];
             if (Sentence.phraseTypes.includes(curr === null || curr === void 0 ? void 0 : curr.tag)) {
@@ -40,6 +41,13 @@ class Sentence {
         }
         ;
         this.tags = this.tags.filter(Boolean);
+        this.fixEmoji();
+    }
+    // This really really needs to be a parser rule
+    fixEmoji() {
+        for (let tag of this.tags) {
+            tag.token = tag.token.replace(/: (\w+) :/g, ":$1:");
+        }
     }
     coalesce_possesives() {
         for (let i = 0; i < this.tags.length; i++) {
@@ -62,7 +70,10 @@ class Sentence {
         return this.tags.filter(t => t.tag[0] == "N").map(s => s.token);
     }
     get emojifiedNounsList() {
-        return this.nouns.map(s => (0, exports.wordIsEmoji)(s) ? `":${s.toLowerCase()}:"` : `"${s}"`);
+        return this.nouns.map(s => (0, exports.wordIsEmoji)(s) ? `:${s.toLowerCase()}:` : s);
+    }
+    get pollOptions() {
+        return this.emojifiedNounsList.map(n => `"${n}"`).join(" ");
     }
     get isQuestion() {
         return this.tags[this.tags.length - 1].token == '?';
@@ -72,7 +83,7 @@ class Sentence {
     }
     get orClauses() {
         if (!this.hasOrClause) {
-            return null;
+            return [];
         }
         let output = [];
         this.tags.forEach((val, i) => {
@@ -85,7 +96,7 @@ class Sentence {
     }
 }
 Sentence.nounTypes = ['NN', 'NNP'];
-Sentence.phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
+Sentence.phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?', ':'];
 class Message {
     constructor(msg) {
         this.rawMessage = msg;

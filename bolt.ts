@@ -2,10 +2,11 @@ import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver
 import {Message} from "./Message";
 import {receiver, handler} from "./bolt_config";
 
+const DEVELOPMENT = (process.env.DEVELOPMENT == "true");
 
 let appConfig;
 
-if (process.env.SLACK_SOCKET_MODE == "true") {
+if (DEVELOPMENT) {
 	appConfig = {
 		signingSecret: process.env.SIGNING_SECRET,
 		token: process.env.TOKEN,
@@ -18,13 +19,13 @@ else {
 		token: process.env.TOKEN,
 		receiver: receiver
 	}
-}
+};
 
 
 const app = new App(appConfig);
 
 app.message(async ({ message, client }) => {
-	console.log(message);
+	if (DEVELOPMENT) { console.log(message) };
 
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let msg = new Message(message.text);
@@ -32,21 +33,16 @@ app.message(async ({ message, client }) => {
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
 	let user = message.user;
 
-
 	for (let sentence of msg.sentences) {
 		if (sentence.hasOrClause) {
-			let nouns = sentence.emojifiedNounsList.join(" ");
-			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${nouns}\``;
-
+			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
 			await client.chat.postEphemeral({
 				channel: message.channel,
 				user: user,
 				text: simplePollText
 			})
-		
 		}
 	}
-
 });
 
 (async () => {
