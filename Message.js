@@ -13,7 +13,7 @@ const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural_1.default.SentenceTokenizer();
 const wt = new natural_1.default.WordPunctTokenizer();
 let wordIsEmoji = (word) => {
-    return default_emoji_json_1.default.hasOwnProperty(word.toLowerCase());
+    return word.toLowerCase() in default_emoji_json_1.default;
 };
 exports.wordIsEmoji = wordIsEmoji;
 class Sentence {
@@ -59,12 +59,10 @@ class Sentence {
         }
     }
     get nouns() {
-        return this.tags.filter(t => t.tag[0] == "N");
+        return this.tags.filter(t => t.tag[0] == "N").map(s => s.token);
     }
     get emojifiedNounsList() {
-        let nounList = this.nouns.map(s => s.token);
-        // this.nouns.map( (n) )
-        return true;
+        return this.nouns.map(s => (0, exports.wordIsEmoji)(s) ? `":${s.toLowerCase()}:"` : `"${s}"`);
     }
     get isQuestion() {
         return this.tags[this.tags.length - 1].token == '?';

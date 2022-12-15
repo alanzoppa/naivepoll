@@ -35,7 +35,7 @@ app.message(async ({ message, client }) => {
 
 	for (let sentence of msg.sentences) {
 		if (sentence.hasOrClause) {
-			let nouns = sentence.nouns.map(s => `"${s.token}"`).join(" ")
+			let nouns = sentence.emojifiedNounsList.join(" ");
 			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${nouns}\``;
 
 			await client.chat.postEphemeral({

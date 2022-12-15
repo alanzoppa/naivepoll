@@ -10,7 +10,7 @@ const wt = new natural.WordPunctTokenizer();
 
 
 export let wordIsEmoji = (word:string):boolean => {
-    return emoji.hasOwnProperty(word.toLowerCase());
+    return word.toLowerCase() in emoji;
 }
 
 class Sentence {
@@ -65,14 +65,11 @@ class Sentence {
     } 
 
     get nouns() {
-        return this.tags.filter( t => t.tag[0] == "N" );
+        return this.tags.filter( t => t.tag[0] == "N" ).map(s => s.token);
     }
 
     get emojifiedNounsList() {
-
-        let nounList = this.nouns.map(s => s.token)
-        // this.nouns.map( (n) )
-        return true;
+        return this.nouns.map(s => wordIsEmoji(s) ? `":${s.toLowerCase()}:"` : `"${s}"`)
     }
 
     get isQuestion() {

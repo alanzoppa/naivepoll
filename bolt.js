@@ -36,7 +36,7 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     let user = message.user;
     for (let sentence of msg.sentences) {
         if (sentence.hasOrClause) {
-            let nouns = sentence.nouns.map(s => `"${s.token}"`).join(" ");
+            let nouns = sentence.emojifiedNounsList.join(" ");
             let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${nouns}\``;
             yield client.chat.postEphemeral({
                 channel: message.channel,

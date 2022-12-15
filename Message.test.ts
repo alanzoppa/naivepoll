@@ -15,6 +15,7 @@ describe("Sentence", () => {
     let statement = new Message("Just a declarative statement.");
     let multiword = new Message("Kevin's stinky Pizza or Todd's greasy pasta?");
     let snooting = new Message("Should we go snooting, micro snooting, or retro snooting?");
+    let emojis = new Message("Should we get pizza or beer?");
 
     test("isQuestion", ()=> {
         expect(question.sentences[0].isQuestion).toBe(true);
@@ -50,9 +51,17 @@ describe("Sentence", () => {
 
     test ("nouns", ()=> {
         expect(
-            snooting.sentences[0].nouns.map( (n)=> n.token)
+            snooting.sentences[0].nouns
             ).toEqual(
                 ["micro snooting", "retro snooting"]
+            )
+    })
+
+    test ("emojifiedNounList", ()=> {
+        expect(
+            emojis.sentences[0].emojifiedNounsList
+            ).toEqual(
+                ['":pizza:"', '":beer:"']
             )
     })
 
@@ -64,4 +73,3 @@ describe("wordIsEmoji", () => {
         expect(wordIsEmoji("Pizza")).toBe(true);
     })
 })
-
