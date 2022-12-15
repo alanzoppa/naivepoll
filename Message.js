@@ -11,8 +11,7 @@ const lexicon = new natural_1.default.Lexicon("EN", "?", "NNP");
 const ruleSet = new natural_1.default.RuleSet('EN');
 const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural_1.default.SentenceTokenizer();
-// const wt = new natural.WordPunctTokenizer();
-const wt = new natural_1.default.RegexpTokenizer({ pattern: /([A-zÀ-ÿ-]+|[0-9._]+|.|!|\?|'|"|;|,|-)/ });
+const wt = new natural_1.default.WordPunctTokenizer();
 let wordIsEmoji = (word) => {
     return word.toLowerCase() in default_emoji_json_1.default;
 };
@@ -43,12 +42,15 @@ class Sentence {
         this.tags = this.tags.filter(Boolean);
         this.fixEmoji();
     }
-    // This really really needs to be a parser rule
+    // This really really needs to be a natural parser rule
     fixEmoji() {
         for (let tag of this.tags) {
             tag.token = tag.token.replace(/: (\w+) :/g, ":$1:");
         }
     }
+    // This turns sequential related tokens into a single phrase
+    // e.g. ["Should", "we", "get", "thin", "crust", "pizza", "or", "german", "beer", "?"] =>
+    //      ["Should", "we", "get", "thin crust pizza", "or", "german beer", "?"] =>
     coalesce_possesives() {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next, next_next] = [
@@ -63,6 +65,7 @@ class Sentence {
                 delete this.tags[i + 1];
                 delete this.tags[i + 2];
             }
+            // Weirdo JS behavior because arrays don't really exist
             this.tags = this.tags.filter(Boolean);
         }
     }
@@ -88,8 +91,7 @@ class Sentence {
         let output = [];
         this.tags.forEach((val, i) => {
             if (val.token == 'or') {
-                let entry = { index: i };
-                output.push(entry);
+                output.push({ index: i });
             }
         });
         return output;

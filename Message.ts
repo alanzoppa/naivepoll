@@ -6,10 +6,7 @@ const lexicon = new natural.Lexicon("EN", "?", "NNP");
 const ruleSet = new natural.RuleSet('EN');
 const tagger = new natural.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural.SentenceTokenizer();
-// const wt = new natural.WordPunctTokenizer();
-
-const wt = new natural.RegexpTokenizer({pattern: /([A-zÀ-ÿ-]+|[0-9._]+|.|!|\?|'|"|;|,|-)/});
-
+const wt = new natural.WordPunctTokenizer();
 
 
 export let wordIsEmoji = (word:string):boolean => {
@@ -49,13 +46,16 @@ class Sentence {
         this.fixEmoji();
     }
 
-    // This really really needs to be a parser rule
+    // This really really needs to be a natural parser rule
     private fixEmoji():void {
         for (let tag of this.tags) {
             tag.token = tag.token.replace(/: (\w+) :/g, ":$1:");
         }
     }
 
+    // This turns sequential related tokens into a single phrase
+    // e.g. ["Should", "we", "get", "thin", "crust", "pizza", "or", "german", "beer", "?"] =>
+    //      ["Should", "we", "get", "thin crust pizza", "or", "german beer", "?"] =>
     private coalesce_possesives():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next, next_next] = [
@@ -71,6 +71,7 @@ class Sentence {
                     delete this.tags[i+1];
                     delete this.tags[i+2];
             }
+            // Weirdo JS behavior because arrays don't really exist
             this.tags = this.tags.filter(Boolean);
         }
     } 
@@ -97,11 +98,10 @@ class Sentence {
 
     get orClauses():object[] {
         if (!this.hasOrClause) {return []}
-        let output:object[]   = [];
+        let output:object[] = [];
         this.tags.forEach( (val, i)=> {
             if (val.token == 'or') {
-                let entry = {index: i};
-                output.push(entry)
+                output.push({index: i})
             }
         })
         return output;
