@@ -3,14 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Message = void 0;
+exports.Message = exports.wordIsEmoji = void 0;
 const natural_1 = __importDefault(require("natural"));
+const default_emoji_json_1 = __importDefault(require("./default_emoji.json"));
 // @ts-ignore this type/arity problem in natural/@types
 const lexicon = new natural_1.default.Lexicon("EN", "?", "NNP");
 const ruleSet = new natural_1.default.RuleSet('EN');
 const tagger = new natural_1.default.BrillPOSTagger(lexicon, ruleSet);
 const st = new natural_1.default.SentenceTokenizer();
 const wt = new natural_1.default.WordPunctTokenizer();
+let wordIsEmoji = (word) => {
+    return default_emoji_json_1.default.hasOwnProperty(word.toLowerCase());
+};
+exports.wordIsEmoji = wordIsEmoji;
 class Sentence {
     constructor(sentence) {
         this.rawSentence = sentence;
@@ -21,11 +26,10 @@ class Sentence {
     collapse_nouns() {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i + 1]];
-            let allowList = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
-            if (allowList.includes(curr === null || curr === void 0 ? void 0 : curr.tag)) {
+            if (Sentence.phraseTypes.includes(curr === null || curr === void 0 ? void 0 : curr.tag)) {
                 let tmp_next = next;
                 let cursor = 1;
-                while (allowList.includes(tmp_next === null || tmp_next === void 0 ? void 0 : tmp_next.tag)) {
+                while (Sentence.phraseTypes.includes(tmp_next === null || tmp_next === void 0 ? void 0 : tmp_next.tag)) {
                     curr.token = curr.token + " " + tmp_next.token;
                     curr.tag = "NNP";
                     delete this.tags[i + cursor];
@@ -57,6 +61,11 @@ class Sentence {
     get nouns() {
         return this.tags.filter(t => t.tag[0] == "N");
     }
+    get emojifiedNounsList() {
+        let nounList = this.nouns.map(s => s.token);
+        // this.nouns.map( (n) )
+        return true;
+    }
     get isQuestion() {
         return this.tags[this.tags.length - 1].token == '?';
     }
@@ -78,6 +87,7 @@ class Sentence {
     }
 }
 Sentence.nounTypes = ['NN', 'NNP'];
+Sentence.phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
 class Message {
     constructor(msg) {
         this.rawMessage = msg;

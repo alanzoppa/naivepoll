@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import {Message} from "./Message";
+import {Message, wordIsEmoji} from "./Message";
 import natural from "natural";
 
 
@@ -13,7 +13,6 @@ describe("tagging", () => {
 describe("Sentence", () => {
     let question = new Message("Where should we go? Pequod's or Gino's?");
     let statement = new Message("Just a declarative statement.");
-    let declarative = new Message("Kevin is a large chihuahua who enjoys pizza");
     let multiword = new Message("Kevin's stinky Pizza or Todd's greasy pasta?");
     let snooting = new Message("Should we go snooting, micro snooting, or retro snooting?");
 
@@ -58,3 +57,11 @@ describe("Sentence", () => {
     })
 
 })
+
+describe("wordIsEmoji", () => {
+    test("case insensitivity", ()=> {
+        expect(wordIsEmoji("pizza")).toBe(true);
+        expect(wordIsEmoji("Pizza")).toBe(true);
+    })
+})
+

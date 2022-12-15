@@ -1,5 +1,5 @@
 import natural, { TaggedWord } from "natural";
-
+import emoji from './default_emoji.json';
 
 // @ts-ignore this type/arity problem in natural/@types
 const lexicon = new natural.Lexicon("EN", "?", "NNP");
@@ -9,10 +9,15 @@ const st = new natural.SentenceTokenizer();
 const wt = new natural.WordPunctTokenizer();
 
 
+export let wordIsEmoji = (word:string):boolean => {
+    return emoji.hasOwnProperty(word.toLowerCase());
+}
+
 class Sentence {
     tags: TaggedWord[];
     rawSentence: string;
     static nounTypes = ['NN', 'NNP'];
+    static phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
 
     constructor(sentence: string) {
         this.rawSentence = sentence;
@@ -21,14 +26,13 @@ class Sentence {
         this.collapse_nouns();
     }
 
-    private collapse_nouns() {
+    private collapse_nouns():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i+1]]
-            let allowList = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?'];
-            if (allowList.includes(curr?.tag)) {
+            if (Sentence.phraseTypes.includes(curr?.tag)) {
                 let tmp_next = next;
                 let cursor = 1;
-                while (allowList.includes(tmp_next?.tag)) {
+                while (Sentence.phraseTypes.includes(tmp_next?.tag)) {
                     curr.token = curr.token + " " + tmp_next.token;
                     curr.tag = "NNP"
                     delete this.tags[i+cursor];
@@ -41,7 +45,7 @@ class Sentence {
         this.tags = this.tags.filter(Boolean);
     }
 
-    private coalesce_possesives() {
+    private coalesce_possesives():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next, next_next] = [
                 this.tags[i],
@@ -62,6 +66,13 @@ class Sentence {
 
     get nouns() {
         return this.tags.filter( t => t.tag[0] == "N" );
+    }
+
+    get emojifiedNounsList() {
+
+        let nounList = this.nouns.map(s => s.token)
+        // this.nouns.map( (n) )
+        return true;
     }
 
     get isQuestion() {
