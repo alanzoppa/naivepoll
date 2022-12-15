@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bolt_1 = require("@slack/bolt");
 const Message_1 = require("./Message");
 const bolt_config_1 = require("./bolt_config");
+const blocks_1 = require("./blocks");
 const DEVELOPMENT = (process.env.DEVELOPMENT == "true");
 let appConfig;
 if (DEVELOPMENT) {
@@ -42,13 +43,21 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     for (let sentence of msg.sentences) {
         if (sentence.hasOrClause) {
             let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
+            // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+            let blocks = (0, blocks_1.makePollButton)(sentence.rawSentence, message.client_msg_id);
             yield client.chat.postEphemeral({
                 channel: message.channel,
                 user: user,
+                blocks: blocks,
                 text: simplePollText
             });
         }
     }
+}));
+app.action(/^increment/, ({ action, ack, say }) => __awaiter(void 0, void 0, void 0, function* () {
+    yield ack();
+    // await say('hello world');
+    console.log(action);
 }));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield app.start(process.env.PORT || 3000);

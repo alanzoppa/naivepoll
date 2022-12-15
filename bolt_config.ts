@@ -11,4 +11,3 @@ export const handler = async (event, context, callback) => {
     const handler = await receiver.start();
     return handler(event, context, callback);
 }
-

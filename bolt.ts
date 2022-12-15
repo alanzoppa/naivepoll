@@ -1,6 +1,7 @@
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver } from '@slack/bolt';
 import {Message} from "./Message";
 import {receiver, handler} from "./bolt_config";
+import {makePollButton} from "./blocks";
 
 const DEVELOPMENT = (process.env.DEVELOPMENT == "true");
 
@@ -24,6 +25,9 @@ else {
 
 const app = new App(appConfig);
 
+
+
+
 app.message(async ({ message, client }) => {
 	if (DEVELOPMENT) { console.log(message) };
 
@@ -33,17 +37,31 @@ app.message(async ({ message, client }) => {
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
 	let user = message.user;
 
+
 	for (let sentence of msg.sentences) {
 		if (sentence.hasOrClause) {
 			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
+			// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+			let blocks = makePollButton(sentence.rawSentence, message.client_msg_id);
 			await client.chat.postEphemeral({
 				channel: message.channel,
 				user: user,
+				blocks: blocks,
 				text: simplePollText
 			})
 		}
 	}
 });
+
+
+app.action(/^increment/, async ({action, ack, say}) => { 
+	await ack();
+	// await say('hello world');
+	console.log(action);
+  });
+
+
+
 
 (async () => {
 	await app.start(process.env.PORT || 3000);
