@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makePoll = exports.makePollButton = void 0;
-const Message_1 = require("./Message");
 const makePollButton = (message, id) => {
     return [
         {
@@ -24,10 +23,8 @@ const makePollButton = (message, id) => {
     ];
 };
 exports.makePollButton = makePollButton;
-const makePoll = (text, id) => {
-    var _a;
-    let sentence = (_a = new Message_1.Message(text)) === null || _a === void 0 ? void 0 : _a.sentences[0];
-    let buttons = sentence.nouns.map(noun => {
+const makePoll = (options) => {
+    let buttons = options.map(noun => {
         return {
             "type": "button",
             "text": {
@@ -38,11 +35,20 @@ const makePoll = (text, id) => {
             "value": "click_me_123"
         };
     });
-    return [
+    let out = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "This is the poll"
+            }
+        },
         {
             "type": "actions",
-            "elements": [buttons]
+            "elements": buttons
         }
     ];
+    console.log(out);
+    return out;
 };
 exports.makePoll = makePoll;

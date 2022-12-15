@@ -1,7 +1,7 @@
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver } from '@slack/bolt';
-import {Message} from "./Message";
+import {Message, Sentence} from "./Message";
 import {receiver, handler} from "./bolt_config";
-import {makePollButton} from "./blocks";
+import {makePollButton, makePoll} from "./blocks";
 
 const DEVELOPMENT = (process.env.DEVELOPMENT == "true");
 
@@ -42,6 +42,7 @@ app.message(async ({ message, client }) => {
 		if (sentence.hasOrClause) {
 			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
 			// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+			
 			let blocks = makePollButton(sentence.rawSentence, message.client_msg_id);
 			await client.chat.postEphemeral({
 				channel: message.channel,
@@ -56,8 +57,14 @@ app.message(async ({ message, client }) => {
 
 app.action(/^increment/, async ({action, ack, say}) => { 
 	await ack();
-	// await say('hello world');
 	console.log(action);
+	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+	let sentence = new Sentence(action.value);
+	let blocks = makePoll(sentence.nouns);
+	say({
+			text: `This is a poll The options are ${sentence.emojifiedNounsList}`,
+			blocks: blocks
+		});
   });
 
 

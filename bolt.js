@@ -56,8 +56,14 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
 }));
 app.action(/^increment/, ({ action, ack, say }) => __awaiter(void 0, void 0, void 0, function* () {
     yield ack();
-    // await say('hello world');
     console.log(action);
+    // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+    let sentence = new Message_1.Sentence(action.value);
+    let blocks = (0, blocks_1.makePoll)(sentence.nouns);
+    say({
+        text: `This is a poll The options are ${sentence.emojifiedNounsList}`,
+        blocks: blocks
+    });
 }));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield app.start(process.env.PORT || 3000);

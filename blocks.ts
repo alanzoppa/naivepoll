@@ -1,4 +1,4 @@
-import {Message} from "./Message";
+import {Message, Sentence} from "./Message";
 
 
 
@@ -24,10 +24,9 @@ export const makePollButton = (message:string, id:string) => {
 	]
 }
 
-export const makePoll = (text:string, id:string) => {
+export const makePoll = (options:string[]) => {
 
-    let sentence = new Message(text)?.sentences[0];
-    let buttons = sentence.nouns.map( noun => {
+    let buttons = options.map( noun => {
         return {
             "type": "button",
             "text": {
@@ -39,10 +38,28 @@ export const makePoll = (text:string, id:string) => {
         }
     });
 
-    return [
-		{
-			"type": "actions",
-			"elements": [ buttons ]
-		}
-	]
+
+    let out = [
+
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "This is the poll"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": buttons
+        }
+
+    ]
+    console.log(out);
+
+    return out
+
+
+
+
 }
+
