@@ -60,9 +60,10 @@ app.action(/^createPoll/, async ({action, ack, say, body}) => {
 	console.log(action);
 	// console.log(body);
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-	let [sentence, id] = [new Sentence(action.value), body.container.message_ts]
+	let sentence = new Sentence(action.value);
+	// let [sentence, id] = [new Sentence(action.value), body.container.message_ts]
 	let votes = sentence.nouns.map( noun => [noun, 0] );
-	let blocks = makePoll(votes, `${id}`);
+	let blocks = makePoll(votes);
 	say({
 			text: `This is a poll The options are ${sentence.emojifiedNounsList}`,
 			blocks: blocks
@@ -73,10 +74,20 @@ app.action(/^createPoll/, async ({action, ack, say, body}) => {
 app.action(/^increment/, async ({action, ack, say, client, body}) => { 
 	await ack();
 	console.log(action);
+	// console.log(body);
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-	// console.log(body.container);
-	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-	let [channel, target_ts] = [action.channel, body.container.message_ts]
+	let [channel, target_ts, channel_id, noun, value] = [action.channel, body.container.message_ts, body.container.channel_id, action.text.text, parseInt(action.value)]
+
+	let original_message:any = await client.conversations.history({
+		channel: channel_id,
+		latest: target_ts,
+		inclusive: true,
+		limit: 1
+	});
+	original_message = original_message?.messages[0];
+
+	console.log(original_message);
+
 	// client.chat.update({ channel: channel, ts: target_ts, blocks: makePoll});
   });
 

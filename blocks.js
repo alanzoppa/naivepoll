@@ -23,7 +23,7 @@ const makePollButton = (message, id) => {
     ];
 };
 exports.makePollButton = makePollButton;
-const makePoll = (votes, id) => {
+const makePoll = (votes) => {
     let buttons = votes.map((v, i) => {
         return {
             "type": "button",
@@ -33,7 +33,7 @@ const makePoll = (votes, id) => {
                 "emoji": true
             },
             "value": `${v[1]}`,
-            "action_id": `increment__${id}__${i}`
+            "action_id": `increment__${v[0]}`
         };
     });
     return [
