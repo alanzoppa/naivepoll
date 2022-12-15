@@ -18,29 +18,28 @@ export const makePollButton = (message:string, id:string) => {
 					"emoji": true
 				},
 				"value": message,
-				"action_id": `increment__${id}`
+				"action_id": `createPoll__${id}`
 			}
 		}
 	]
 }
 
-export const makePoll = (options:string[]) => {
-
-    let buttons = options.map( noun => {
+export const makePoll = (votes:any[][], id:string) => {
+    let buttons = votes.map( (v,i) => {
         return {
             "type": "button",
             "text": {
                 "type": "plain_text",
-                "text": noun,
+                "text": v[0],
                 "emoji": true
             },
-            "value": "click_me_123"
+            "value": `${v[1]}`,
+            "action_id": `increment__${id}__${i}`
         }
     });
 
 
-    let out = [
-
+    return [
         {
             "type": "section",
             "text": {
@@ -54,9 +53,6 @@ export const makePoll = (options:string[]) => {
         }
 
     ]
-    console.log(out);
-
-    return out
 
 
 

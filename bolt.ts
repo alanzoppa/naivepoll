@@ -55,12 +55,14 @@ app.message(async ({ message, client }) => {
 });
 
 
-app.action(/^increment/, async ({action, ack, say}) => { 
+app.action(/^createPoll/, async ({action, ack, say, body}) => { 
 	await ack();
 	console.log(action);
+	// console.log(body);
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-	let sentence = new Sentence(action.value);
-	let blocks = makePoll(sentence.nouns);
+	let [sentence, id] = [new Sentence(action.value), body.container.message_ts]
+	let votes = sentence.nouns.map( noun => [noun, 0] );
+	let blocks = makePoll(votes, `${id}`);
 	say({
 			text: `This is a poll The options are ${sentence.emojifiedNounsList}`,
 			blocks: blocks
@@ -68,6 +70,15 @@ app.action(/^increment/, async ({action, ack, say}) => {
   });
 
 
+app.action(/^increment/, async ({action, ack, say, client, body}) => { 
+	await ack();
+	console.log(action);
+	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+	// console.log(body.container);
+	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
+	let [channel, target_ts] = [action.channel, body.container.message_ts]
+	// client.chat.update({ channel: channel, ts: target_ts, blocks: makePoll});
+  });
 
 
 (async () => {
