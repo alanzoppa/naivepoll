@@ -18,9 +18,9 @@ if (DEVELOPMENT) {
 }
 else {
 	appConfig = {
+		signingSecret: process.env.SIGNING_SECRET,
 		token: process.env.TOKEN,
 		appToken: process.env.APP_TOKEN
-		signingSecret: process.env.SIGNING_SECRET,
 		// receiver: receiver
 	}
 };

@@ -1,2 +1,2 @@
-worker: node bolt.js
+web: node bolt.js
 
