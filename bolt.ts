@@ -1,6 +1,6 @@
-import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver, ViewStateValue } from '@slack/bolt';
+import { App, LogLevel, subtype, BotMessageEvent, BlockAction, ViewStateValue } from '@slack/bolt';
 import {Message, Sentence} from "./Message";
-import {receiver, isInvalid} from "./bolt_config";
+import {isInvalid} from "./bolt_config";
 import {makePollButton, makePoll} from "./blocks";
 import * as util from "util";
 
