@@ -20,6 +20,7 @@ const handler = (event, context, callback) => __awaiter(void 0, void 0, void 0, 
     return handler(event, context, callback);
 });
 exports.handler = handler;
+// TODO better way to determine this
 const isInvalid = (message) => {
     return ("message" in message) || ("subtype" in message);
 };

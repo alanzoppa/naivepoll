@@ -23,7 +23,7 @@ const makePollButton = (message, id) => {
     ];
 };
 exports.makePollButton = makePollButton;
-const makePoll = (votes) => {
+const makePoll = (votes, text) => {
     let buttons = votes.map((v, i, ary) => {
         return {
             "type": "button",
@@ -41,7 +41,7 @@ const makePoll = (votes) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "This is the poll"
+                "text": text
             }
         },
         {

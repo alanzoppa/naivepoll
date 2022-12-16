@@ -24,7 +24,7 @@ export const makePollButton = (message:string, id:string) => {
 	]
 }
 
-export const makePoll = (votes:any[][]) => {
+export const makePoll = (votes:any[][], text:string) => {
     let buttons = votes.map( (v,i,ary) => {
         return {
             "type": "button",
@@ -44,7 +44,7 @@ export const makePoll = (votes:any[][]) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "This is the poll"
+                "text": text
             }
         },
         {

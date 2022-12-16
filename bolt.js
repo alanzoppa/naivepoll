@@ -59,7 +59,7 @@ app.action(/^createPoll/, ({ action, ack, say, body }) => __awaiter(void 0, void
     // @ts-ignore
     let sentence = new Message_1.Sentence(action.value);
     let votes = sentence.nouns.map(noun => [noun, 0]);
-    let blocks = (0, blocks_1.makePoll)(votes);
+    let blocks = (0, blocks_1.makePoll)(votes, sentence.rawSentence);
     say({
         text: sentence.rawSentence,
         blocks: blocks
@@ -67,11 +67,10 @@ app.action(/^createPoll/, ({ action, ack, say, body }) => __awaiter(void 0, void
 }));
 app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 0, void 0, void 0, function* () {
     yield ack();
-    // console.log(action);
-    // console.log(body);
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
     let [og_text, poll_ts, channel_id, noun, value] = [body.message.text, body.container.message_ts, body.container.channel_id, action.text.text, JSON.parse(action.value)];
-    noun = noun.replace(/ \(\d+\)/, '');
+    // This is a dumb solution because I'm bad at blocks layout
+    noun = noun.replace(/ \(\d+\)$/, '');
     let poll_message = yield client.conversations.history({
         channel: channel_id,
         latest: poll_ts,
@@ -80,20 +79,16 @@ app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 
     });
     poll_message = poll_message === null || poll_message === void 0 ? void 0 : poll_message.messages[0];
     for (let i = 0; i < value.length; i++) {
-        console.log(noun, value[i]);
         if (value[i][0] == noun) {
-            value[i][1] += 1;
+            value[i][1]++;
         }
     }
-    console.log(value);
-    let blocks = (0, blocks_1.makePoll)(value);
-    console.log(blocks[1]);
     client.chat.update({
         channel: channel_id,
         ts: poll_ts,
-        blocks: blocks,
+        blocks: (0, blocks_1.makePoll)(value, og_text),
         as_user: true,
-        text: "baz"
+        text: og_text
     });
 }));
 (() => __awaiter(void 0, void 0, void 0, function* () {

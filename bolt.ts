@@ -53,7 +53,7 @@ app.action(/^createPoll/, async ({action, ack, say, body}) => {
 	// @ts-ignore
 	let sentence = new Sentence(action.value);
 	let votes = sentence.nouns.map( noun => [noun, 0] );
-	let blocks = makePoll(votes);
+	let blocks = makePoll(votes, sentence.rawSentence);
 	say({
 			text: sentence.rawSentence,
 			blocks: blocks
@@ -63,13 +63,12 @@ app.action(/^createPoll/, async ({action, ack, say, body}) => {
 
 app.action(/^increment/, async ({action, ack, say, client, body}) => { 
 	await ack();
-	// console.log(action);
-	// console.log(body);
 
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
 	let [og_text, poll_ts, channel_id, noun, value] = [body.message.text, body.container.message_ts, body.container.channel_id, action.text.text, JSON.parse(action.value)]
 
-	noun = noun.replace(/ \(\d+\)/, '');
+	// This is a dumb solution because I'm bad at blocks layout
+	noun = noun.replace(/ \(\d+\)$/, '');
 
 	let poll_message:any = await client.conversations.history({
 		channel: channel_id,
@@ -80,23 +79,17 @@ app.action(/^increment/, async ({action, ack, say, client, body}) => {
 	poll_message = poll_message?.messages[0];
 
 	for (let i = 0; i < value.length; i++) {
-		console.log(noun, value[i])
 		if (value[i][0] == noun) {
-			value[i][1] += 1;
+			value[i][1]++;
 		}
 	}
-
-	console.log(value);
-
-	let blocks = makePoll(value);
-	console.log(blocks[1]);
 
 	client.chat.update({
 		channel: channel_id,
 		ts: poll_ts,
-		blocks: blocks,
+		blocks: makePoll(value, og_text),
 		as_user: true,
-		text: "baz"
+		text: og_text
 	});
 
   });
