@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Message = exports.wordIsEmoji = void 0;
+exports.Message = exports.Sentence = exports.wordIsEmoji = void 0;
 const natural_1 = __importDefault(require("natural"));
 const default_emoji_json_1 = __importDefault(require("./default_emoji.json"));
 // @ts-ignore this type/arity problem in natural/@types
@@ -97,6 +97,7 @@ class Sentence {
         return output;
     }
 }
+exports.Sentence = Sentence;
 Sentence.nounTypes = ['NN', 'NNP'];
 Sentence.phraseTypes = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', '?', ':'];
 class Message {

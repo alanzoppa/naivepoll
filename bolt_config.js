@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = exports.receiver = void 0;
+exports.isInvalid = exports.handler = exports.receiver = void 0;
 const bolt_1 = require("@slack/bolt");
 exports.receiver = new bolt_1.AwsLambdaReceiver({
     signingSecret: process.env.SIGNING_SECRET,
@@ -20,3 +20,7 @@ const handler = (event, context, callback) => __awaiter(void 0, void 0, void 0, 
     return handler(event, context, callback);
 });
 exports.handler = handler;
+const isInvalid = (message) => {
+    return ("message" in message) || ("subtype" in message);
+};
+exports.isInvalid = isInvalid;

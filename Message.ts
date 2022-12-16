@@ -13,7 +13,7 @@ export let wordIsEmoji = (word:string):boolean => {
     return word.toLowerCase() in emoji;
 }
 
-class Sentence {
+export class Sentence {
     tags: TaggedWord[];
     rawSentence: string;
     static nounTypes = ['NN', 'NNP'];
