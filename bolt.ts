@@ -19,7 +19,7 @@ if (DEVELOPMENT) {
 else {
 	appConfig = {
 		token: process.env.TOKEN,
-		receiver: receiver
+		// receiver: receiver
 	}
 };
 
@@ -98,4 +98,4 @@ app.action(/^increment/, async ({action, ack, say, client, body}) => {
 	console.log('⚡️ Bolt app is running!');
 })();
 
-module.exports.handler = handler;
+// module.exports.handler = handler;
