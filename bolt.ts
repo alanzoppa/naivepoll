@@ -54,7 +54,7 @@ app.action(/^createPoll/, async ({action, ack, say, body}) => {
 	let sentence = new Sentence(action.value);
 	let votes = sentence.nouns.map( noun => [noun, 0] );
 	let blocks = makePoll(votes, sentence.rawSentence);
-	say({
+	await say({
 			text: sentence.rawSentence,
 			blocks: blocks
 		});
@@ -84,16 +84,14 @@ app.action(/^increment/, async ({action, ack, say, client, body}) => {
 		}
 	}
 
-	client.chat.update({
+	await client.chat.update({
 		channel: channel_id,
 		ts: poll_ts,
 		blocks: makePoll(value, og_text),
 		as_user: true,
 		text: og_text
 	});
-
   });
-
 
 (async () => {
 	await app.start(process.env.PORT || 3000);
