@@ -4,7 +4,8 @@
   "description": "",
   "main": "bolt.js",
   "scripts": {
-    "test": "npx jest"
+    "test": "npx jest",
+    "start": "node bolt.js"
   },
   "author": "",
   "license": "ISC",
