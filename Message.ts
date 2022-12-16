@@ -26,6 +26,9 @@ export class Sentence {
         this.collapseNouns();
     }
 
+    // This turns sequential related tokens into a single phrase
+    // e.g. ["Should", "we", "get", "thin", "crust", "pizza", "or", "german", "beer", "?"] =>
+    //      ["Should", "we", "get", "thin crust pizza", "or", "german beer", "?"] =>
     private collapseNouns():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next] = [this.tags[i], this.tags[i+1]]
@@ -53,9 +56,7 @@ export class Sentence {
         }
     }
 
-    // This turns sequential related tokens into a single phrase
-    // e.g. ["Should", "we", "get", "thin", "crust", "pizza", "or", "german", "beer", "?"] =>
-    //      ["Should", "we", "get", "thin crust pizza", "or", "german beer", "?"] =>
+    // de-tokenizes possessives when they're part of an or clause
     private coalesce_possesives():void {
         for (let i = 0; i < this.tags.length; i++) {
             let [curr, next, next_next] = [
