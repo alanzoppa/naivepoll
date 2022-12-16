@@ -25,8 +25,10 @@ if (DEVELOPMENT) {
 }
 else {
     appConfig = {
+        signingSecret: process.env.SIGNING_SECRET,
         token: process.env.TOKEN,
-        receiver: bolt_config_1.receiver
+        appToken: process.env.APP_TOKEN
+        // receiver: receiver
     };
 }
 ;
@@ -60,7 +62,7 @@ app.action(/^createPoll/, ({ action, ack, say, body }) => __awaiter(void 0, void
     let sentence = new Message_1.Sentence(action.value);
     let votes = sentence.nouns.map(noun => [noun, 0]);
     let blocks = (0, blocks_1.makePoll)(votes, sentence.rawSentence);
-    say({
+    yield say({
         text: sentence.rawSentence,
         blocks: blocks
     });
@@ -83,7 +85,7 @@ app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 
             value[i][1]++;
         }
     }
-    client.chat.update({
+    yield client.chat.update({
         channel: channel_id,
         ts: poll_ts,
         blocks: (0, blocks_1.makePoll)(value, og_text),
@@ -95,4 +97,3 @@ app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 
     yield app.start(process.env.PORT || 3000);
     console.log('⚡️ Bolt app is running!');
 }))();
-module.exports.handler = bolt_config_1.handler;

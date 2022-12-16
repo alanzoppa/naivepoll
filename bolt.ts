@@ -1,6 +1,6 @@
 import { App, LogLevel, subtype, BotMessageEvent, BlockAction, AwsLambdaReceiver, ViewStateValue } from '@slack/bolt';
 import {Message, Sentence} from "./Message";
-import {receiver, handler, isInvalid} from "./bolt_config";
+import {receiver, isInvalid} from "./bolt_config";
 import {makePollButton, makePoll} from "./blocks";
 import * as util from "util";
 
@@ -99,5 +99,3 @@ app.action(/^increment/, async ({action, ack, say, client, body}) => {
 	await app.start(process.env.PORT || 3000);
 	console.log('⚡️ Bolt app is running!');
 })();
-
-// module.exports.handler = handler;
