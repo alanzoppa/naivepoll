@@ -19,6 +19,8 @@ if (DEVELOPMENT) {
 else {
 	appConfig = {
 		token: process.env.TOKEN,
+		appToken: process.env.APP_TOKEN
+		signingSecret: process.env.SIGNING_SECRET,
 		// receiver: receiver
 	}
 };
