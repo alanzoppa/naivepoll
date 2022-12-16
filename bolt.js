@@ -39,9 +39,7 @@ app.message(({ message, client }) => __awaiter(void 0, void 0, void 0, function*
     }
     ;
     // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-    let msg = new Message_1.Message(message.text);
-    // @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-    let user = message.user;
+    let [msg, user] = [new Message_1.Message(message.text), message.user];
     for (let sentence of msg.sentences) {
         if (sentence.hasOrClause) {
             let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
@@ -97,14 +95,6 @@ app.action(/^increment/, ({ action, ack, say, client, body }) => __awaiter(void 
         as_user: true,
         text: "baz"
     });
-    // say({
-    // 	channel: channel_id,
-    // 	// ts: poll_ts,
-    // 	blocks: blocks,
-    // 	// as_user: true,
-    // 	text: "baz"
-    // });
-    // client.chat.delete({ channel: channel_id, ts: poll_ts})
 }));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield app.start(process.env.PORT || 3000);

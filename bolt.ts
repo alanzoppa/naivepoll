@@ -23,28 +23,19 @@ else {
 	}
 };
 
-
 const app = new App(appConfig);
-
-
-
 
 app.message(async ({ message, client }) => {
 	if (isInvalid(message)) return;
 	if (DEVELOPMENT) { console.log(message) };
 
 	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-    let msg = new Message(message.text);
-
-	// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-	let user = message.user;
-
+    let [msg, user] = [new Message(message.text), message.user]
 
 	for (let sentence of msg.sentences) {
 		if (sentence.hasOrClause) {
 			let simplePollText = `Make this a poll! Just send this slash command: \n\`/poll "${sentence.rawSentence}" ${sentence.pollOptions}\``;
 			// @ts-ignore https://github.com/slackapi/bolt-js/issues/904
-			
 			let blocks = makePollButton(sentence.rawSentence, message.client_msg_id);
 			await client.chat.postEphemeral({
 				channel: message.channel,
@@ -107,17 +98,6 @@ app.action(/^increment/, async ({action, ack, say, client, body}) => {
 		as_user: true,
 		text: "baz"
 	});
-
-
-
-	// say({
-	// 	channel: channel_id,
-	// 	// ts: poll_ts,
-	// 	blocks: blocks,
-	// 	// as_user: true,
-	// 	text: "baz"
-	// });
-	// client.chat.delete({ channel: channel_id, ts: poll_ts})
 
   });
 

@@ -14,7 +14,7 @@ export const makePollButton = (message:string, id:string) => {
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Create Poll",
+					"text": "Make this a poll!",
 					"emoji": true
 				},
 				"value": message,
